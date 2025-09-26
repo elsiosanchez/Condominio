@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import apiClient from '@/services/api';
 import UserModal from '@/components/UserModal.vue';
 
@@ -13,9 +13,17 @@ interface User {
 const users = ref<User[]>([]);
 const isLoading = ref(true);
 const error = ref<string | null>(null);
+const search = ref('');
 
 const isModalOpen = ref(false);
 const selectedUser = ref<User | null>(null);
+
+const headers = [
+  { title: 'ID', key: 'id', align: 'start' },
+  { title: 'Nombre', key: 'name' },
+  { title: 'Email', key: 'email' },
+  { title: 'Acciones', key: 'actions', sortable: false, align: 'end' },
+];
 
 const fetchUsers = async () => {
   isLoading.value = true;
@@ -70,40 +78,42 @@ onMounted(fetchUsers);
 </script>
 
 <template>
-  <div class="container mx-auto p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">Lista de Usuarios</h1>
-      <button @click="openCreateModal" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300">
-        Crear Usuario
-      </button>
-    </div>
+  <v-container fluid>
+    <v-card>
+      <v-card-title>
+        <span class="text-h5">Lista de Usuarios</span>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" @click="openCreateModal">Crear Usuario</v-btn>
+      </v-card-title>
+      <v-card-text>
+        <v-text-field
+          v-model="search"
+          append-inner-icon="mdi-magnify"
+          label="Buscar"
+          single-line
+          hide-details
+          class="mb-4"
+        ></v-text-field>
+        <v-alert v-if="error" type="error" density="compact" class="mb-4">{{ error }}</v-alert>
+        <v-data-table
+          :headers="headers"
+          :items="users"
+          :search="search"
+          :loading="isLoading"
+          class="elevation-1"
+          item-value="id"
+        >
+          <template v-slot:loading>
+            <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
+          </template>
 
-    <div v-if="isLoading" class="text-center">Cargando...</div>
-    <div v-if="error" class="p-4 text-red-700 bg-red-100 rounded-md">{{ error }}</div>
-
-    <div v-if="!isLoading && !error" class="overflow-x-auto bg-white rounded-lg shadow">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="user in users" :key="user.id">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.id }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ user.name }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.email }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-              <button @click="openEditModal(user)" class="text-indigo-600 hover:text-indigo-900">Editar</button>
-              <button @click="handleDelete(user.id)" class="text-red-600 hover:text-red-900">Eliminar</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+          <template v-slot:item.actions="{ item }">
+            <v-icon size="small" class="me-2" @click="openEditModal(item)">mdi-pencil</v-icon>
+            <v-icon size="small" @click="handleDelete(item.id)">mdi-delete</v-icon>
+          </template>
+        </v-data-table>
+      </v-card-text>
+    </v-card>
 
     <UserModal 
       :is-open="isModalOpen" 
@@ -111,5 +121,5 @@ onMounted(fetchUsers);
       @close="isModalOpen = false"
       @save="handleSaveUser"
     />
-  </div>
+  </v-container>
 </template>

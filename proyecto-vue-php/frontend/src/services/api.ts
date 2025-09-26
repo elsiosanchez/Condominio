@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000', // URL base de tu API PHP
+  baseURL: '/api', // Prefijo para todas las llamadas a la API
   headers: {
     'Content-Type': 'application/json',
   },

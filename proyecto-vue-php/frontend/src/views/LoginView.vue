@@ -7,6 +7,7 @@ const email = ref('');
 const password = ref('');
 const error = ref<string | null>(null);
 const isLoading = ref(false);
+const showPassword = ref(false);
 
 const handleLogin = async () => {
   error.value = null;
@@ -22,31 +23,45 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-100">
-    <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-      <h2 class="text-2xl font-bold text-center text-gray-800">Iniciar Sesión</h2>
-      <form @submit.prevent="handleLogin" class="space-y-6">
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-          <input v-model="email" type="email" id="email" required
-                 class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-          <input v-model="password" type="password" id="password" required
-                 class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
-        <div v-if="error" class="p-3 text-sm text-red-700 bg-red-100 rounded-md">
-          {{ error }}
-        </div>
-        <div>
-          <button type="submit" :disabled="isLoading"
-                  class="w-full px-4 py-2 font-bold text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300">
-            <span v-if="isLoading">Cargando...</span>
-            <span v-else>Entrar</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
+  <v-container class="fill-height">
+    <v-row justify="center" align="center">
+      <v-col cols="12" sm="8" md="4">
+        <v-card class="elevation-12">
+          <v-toolbar color="primary">
+            <v-toolbar-title>Iniciar Sesión</v-toolbar-title>
+          </v-toolbar>
+          <v-card-text>
+            <v-form @submit.prevent="handleLogin">
+              <v-alert v-if="error" type="error" density="compact" class="mb-4">{{ error }}</v-alert>
+              <v-text-field
+                v-model="email"
+                label="Email"
+                prepend-inner-icon="mdi-email"
+                type="email"
+                required
+              ></v-text-field>
+              <v-text-field
+                v-model="password"
+                label="Contraseña"
+                prepend-inner-icon="mdi-lock"
+                :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                :type="showPassword ? 'text' : 'password'"
+                @click:append-inner="showPassword = !showPassword"
+                required
+              ></v-text-field>
+              <v-btn 
+                :loading="isLoading" 
+                type="submit" 
+                color="primary" 
+                block
+                class="mt-4"
+              >
+                Entrar
+              </v-btn>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>

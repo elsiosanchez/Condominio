@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { RouterView, useRouter } from 'vue-router'
+import { RouterView } from 'vue-router'
 import { useAuthStore } from './stores/auth';
 import { computed } from 'vue';
 
 const authStore = useAuthStore();
-const router = useRouter();
 
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const userName = computed(() => authStore.user?.name);
@@ -18,24 +17,16 @@ authStore.checkAuth();
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-100">
-    <nav v-if="isAuthenticated" class="bg-white shadow-md">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <div class="flex-shrink-0">
-            <h1 class="text-xl font-bold text-gray-800">Gestión de Usuarios</h1>
-          </div>
-          <div class="flex items-center">
-            <span class="text-gray-600 mr-4">Hola, {{ userName }}</span>
-            <button @click="handleLogout" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300">
-              Cerrar Sesión
-            </button>
-          </div>
-        </div>
-      </div>
-    </nav>
-    <main>
+  <v-app>
+    <v-app-bar v-if="isAuthenticated" color="primary" density="compact">
+      <v-app-bar-title>Gestión de Usuarios</v-app-bar-title>
+      <v-spacer></v-spacer>
+      <span class="mr-4">Hola, {{ userName }}</span>
+      <v-btn @click="handleLogout" variant="tonal">Cerrar Sesión</v-btn>
+    </v-app-bar>
+
+    <v-main>
       <RouterView />
-    </main>
-  </div>
+    </v-main>
+  </v-app>
 </template>
